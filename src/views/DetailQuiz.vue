@@ -8,19 +8,28 @@ import Swal from 'sweetalert2'
 const route = useRoute()
 const answers = ref({})
 const openQuestion = ref(false)
-const totalTime = 60
-const timeLeft = ref(totalTime)
+const totalTime = ref(0)
+const timeLeft = ref(0)
 let timer = null
+
+
 
 const data = quiz.find((data) => {
     return data.id == route.params.id
 })
 
-const startTimer = () => {
-    timeLeft.value = totalTime
+const setTotalTime = () => {
+    return totalTime.value = data.questions.length * 15
+}
 
+const startTimer = () => {
+
+    setTotalTime()
+
+    timeLeft.value = totalTime.value
     timer = setInterval(() => {
         timeLeft.value--
+        console.log(timeLeft.value)
 
         if(timeLeft.value <= 0){
             stopTimer()
@@ -79,7 +88,7 @@ const stopQuiz = () => {
 }
 
 const progress = computed(() => {
-    return (timeLeft.value / totalTime) * 100
+    return (timeLeft.value / totalTime.value) * 100
 })
 
 watch(answers, () => {

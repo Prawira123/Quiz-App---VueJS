@@ -36,6 +36,15 @@
           { "id": 2, "label": "B", "text": "Python", "correct": true },
           { "id": 3, "label": "C", "text": "JavaScript", "correct": false }
         ]
+      },
+      {
+        "id": 3,
+        "text": "Which programming language is known for its use in machine learning and data science?",
+        "answers": [
+          { "id": 1, "label": "A", "text": "Java", "correct": false },
+          { "id": 2, "label": "B", "text": "Python", "correct": true },
+          { "id": 3, "label": "C", "text": "JavaScript", "correct": false }
+        ]
       }
     ]
   },
