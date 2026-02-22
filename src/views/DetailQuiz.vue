@@ -1,12 +1,12 @@
 <script setup>
 import quiz from '../data/quiziz.json'
 import {useRoute, RouterView} from 'vue-router'
-import {ref, watch, onUnmounted, computed} from 'vue'
+import {ref, watch, onUnmounted, computed, provide} from 'vue'
 import Swal from 'sweetalert2'
-
 
 const route = useRoute()
 const answers = ref({})
+provide('answers', answers)
 const openQuestion = ref(false)
 const totalTime = ref(0)
 const timeLeft = ref(0)
@@ -65,6 +65,18 @@ const startQuiz = () => {
   })
 }
 
+const calculateScore = () => {
+    let score = 0
+    data.questions.forEach((question) => {
+        const selectedId = answers.value[question.id]
+        const correctAnswer = question.answers.find(a => a.correct)
+        if (selectedId == correctAnswer.id) {
+            score++
+        }
+    })
+    return score
+}
+
 const stopQuiz = () => {
     Swal.fire({
         title: 'Yakin untuk Menyelesaikan Quiz Ini?',
@@ -73,14 +85,19 @@ const stopQuiz = () => {
         icon: 'question',
     }).then((res) => {
         if(res.isConfirmed){
+            const score = calculateScore()
+            // Simpan skor ke localStorage
+            localStorage.setItem(`quiz_score_${data.id}`, score)
+            
             Swal.fire({
                 title: 'Quiz Selesai',
-                text : 'Terimakasih Sudah Mengerjakan Quiz Ini',
+                text : `Terimakasih Sudah Mengerjakan Quiz Ini! Nilai Anda: ${score} / ${data.questions.length}`,
                 icon: 'success',
             }).then((res) => {
                 if(res.isConfirmed){
                     stopTimer()
                     openQuestion.value = false
+                    answers.value = {} // Reset answers
                 }
             })
         }
@@ -106,13 +123,14 @@ const activeAnswer = (id) => {
 </script>
 
 <template>
-    <img :src="data.img" alt="" class="w-full h-[400px] object-cover object-center mb-4">
-    <div class="flex flex-col justify-center items-center mb-10">
-        <h2 class="  text-4xl font-bold text-blue-900 my-10">{{ data.title }}</h2>
-        <button class=" w-auto bg-blue-600 px-4 py-2 text-white rounded-md" @click="startQuiz">Mulai Quiz</button>
-    </div>
+    <div class="" v-if="data">
+        <img :src="data.img" alt="" class="w-full h-[400px] object-cover object-center mb-4">
+        <div class="flex flex-col justify-center items-center mb-10">
+            <h2 class="  text-4xl font-bold text-blue-900 my-10">{{ data.title }}</h2>
+            <button class=" w-auto bg-blue-600 px-4 py-2 text-white rounded-md" @click="startQuiz">Mulai Quiz</button>
+        </div>
 
-    <div class="flex w-full h-[24px] flex-col gap-10" v-if="openQuestion">
+        <div class="flex w-full h-[24px] flex-col gap-10" v-if="openQuestion">
         <div class="relative items-center flex flex-col w-full">
             <div
             class=" -z-1 h-[24px] rounded-full bg-blue-500 transition-all duration-1000"
@@ -124,6 +142,12 @@ const activeAnswer = (id) => {
         <div class="flex items-certer justify-center w-auto pb-10">
             <button class=" bg-blue-600 px-4 py-2 text-white rounded-md" @click="stopQuiz">Selesai</button>
         </div>
+    </div>
+    </div>
+    <div class="flex flex-col items-center justify-center w-full h-screen" v-else>
+        <h1 class="text-9xl font-bold text-blue-900">404</h1>
+        <h2 class="text-4xl font-bold text-blue-900 my-10">Quiz Not Found</h2>
+        <RouterLink to="/" class="btn">Kembali</RouterLink>
     </div>
 </template>
 

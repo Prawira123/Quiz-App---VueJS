@@ -1,9 +1,10 @@
 <script setup>
+    import {inject} from 'vue'
     import {useRoute} from 'vue-router'
     import quizData from '../data/quiziz.json'
-
     const route = useRoute()
     const data = quizData.find((data) => data.id == route.params.id)
+    const answers = inject('answers')
 
 </script>
 
@@ -20,8 +21,8 @@
           type="radio"
           :name="'question-' + question.id"
           :value="answer.id"
+          v-model="answers[question.id]"
         />
-
         <span>
           {{ answer.label }}. {{ answer.text }}
         </span>
